@@ -388,18 +388,21 @@ export const SING_BOX_CONFIG = {
 			{
 				tag: "dns_proxy",
 				address: "tls://1.1.1.1",
-				detour: "🚀 节点选择",
-				address_resolver: "dns_resolver"
+				address_resolver: "dns_resolver",
+				strategy: "prefer_ipv4",
+				detour: "🚀 节点选择"
 			},
 			{
 				tag: "dns_direct",
 				address: "h3://dns.alidns.com/dns-query",
 				address_resolver: "dns_resolver",
+				strategy: "prefer_ipv4",
 				detour: "DIRECT"
 			},
 			{
 				tag: "dns_resolver",
 				address: "223.5.5.5",
+				strategy: "prefer_ipv4",
 				detour: "DIRECT"
 			},
 			{
@@ -419,7 +422,8 @@ export const SING_BOX_CONFIG = {
 					"A",
 					"AAAA"
 				],
-				server: "dns_fakeip"
+				server: "dns_fakeip",
+				disable_cache: true
 			},
 			{
 				rule_set: "geolocation-!cn",
@@ -438,7 +442,7 @@ export const SING_BOX_CONFIG = {
 			}
 		],
 		final: "dns_direct",
-		independent_cache: true
+		strategy: "prefer_ipv4"
 	},
 	ntp: {
 		enabled: true,
@@ -455,15 +459,17 @@ export const SING_BOX_CONFIG = {
 		{ type: "direct", tag: 'DIRECT' }
 	],
 	route : {
-		"rule_set": [
+		rule_set: [
             {
-                "tag": "geosite-geolocation-!cn",
-                "type": "local",
-                "format": "binary",
-                "path": "geosite-geolocation-!cn.srs"
+                tag: "geosite-geolocation-!cn",
+                type: "local",
+                format: "binary",
+                path: "geosite-geolocation-!cn.srs"
             }
 		],
-		rules: []
+		rules: [],
+		final: "DIRECT",
+		auto_detect_interface: true
 	},
 	experimental: {
 		cache_file: {
