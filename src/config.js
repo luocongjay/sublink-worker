@@ -386,25 +386,25 @@ export const SING_BOX_CONFIG = {
 	dns: {
 		servers: [
 			{
-				type: "tcp",
+				// type: "tcp",
 				tag: "dns_proxy",
 				server: "1.1.1.1",
 				detour: "🚀 节点选择",
 				domain_resolver: "dns_resolver"
 			},
 			{
-				type: "https",
+				// type: "https",
 				tag: "dns_direct",
 				server: "dns.alidns.com",
 				domain_resolver: "dns_resolver"
 			},
 			{
-				type: "udp",
+				// type: "udp",
 				tag: "dns_resolver",
 				server: "223.5.5.5"
 			},
 			{
-				type: "fakeip",
+				// type: "fakeip",
 				tag: "dns_fakeip",
 				inet4_range: "198.18.0.0/15",
 				inet6_range: "fc00::/18"
