@@ -381,7 +381,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
   return { site_rule_providers, ip_rule_providers };
 }
 
-// Singbox configuration
+// Singbox configuration - Compatible with sing-box 1.13.0+
 export const SING_BOX_CONFIG = {
 	dns: {
 		servers: [
@@ -417,6 +417,18 @@ export const SING_BOX_CONFIG = {
 		},
 		rules: [
 			{
+				outbound: "any",
+				server: "dns_resolver"
+			},
+			{
+				clash_mode: "direct",
+				server: "dns_direct"
+			},
+			{
+				clash_mode: "global",
+				server: "dns_proxy"
+			},
+			{
 				rule_set: "geolocation-!cn",
 				query_type: [
 					"A",
@@ -437,8 +449,7 @@ export const SING_BOX_CONFIG = {
 					"CNAME"
 				],
 				invert: true,
-				action: "predefined",
-				rcode: "REFUSED"
+				server: "dns_direct"
 			}
 		],
 		final: "dns_direct",
@@ -451,12 +462,29 @@ export const SING_BOX_CONFIG = {
 		interval: '30m'
 	},
 	inbounds: [
-		{ type: 'mixed', tag: 'mixed-in', listen: '0.0.0.0', listen_port: 2080 },
-		{ type: 'tun', tag: 'tun-in', address: ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'], auto_route: true, strict_route: true, stack: 'mixed', sniff: true }
+		{ 
+			type: 'mixed', 
+			tag: 'mixed-in', 
+			listen: '0.0.0.0', 
+			listen_port: 2080 
+		},
+		{ 
+			type: 'tun', 
+			tag: 'tun-in', 
+			address: ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'], 
+			mtu: 1400, 
+			auto_route: true, 
+			strict_route: true, 
+			stack: 'mixed', 
+			sniff: true, 
+			sniff_override_destination: true 
+		}
 	],
 	outbounds: [
-		{ type: 'block', tag: 'REJECT' },
-		{ type: "direct", tag: 'DIRECT' }
+		{ 
+			type: 'direct', 
+			tag: 'DIRECT'
+		}
 	],
 	route : {
 		rule_set: [

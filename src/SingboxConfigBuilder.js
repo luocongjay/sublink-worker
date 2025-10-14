@@ -61,11 +61,13 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
     }
 
     addNodeSelectGroup(proxyList) {
-        proxyList.unshift('DIRECT', 'REJECT', t('outboundNames.Auto Select'));
+        // Note: In sing-box 1.13.0+, use built-in 'reject' outbound instead of 'REJECT'
+        proxyList.unshift('DIRECT', t('outboundNames.Auto Select'));
         this.config.outbounds.unshift({
             type: "selector",
             tag: t('outboundNames.Node Select'),
-            outbounds: proxyList
+            outbounds: proxyList,
+            default: t('outboundNames.Auto Select')
         });
     }
 
@@ -108,40 +110,64 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         this.config.route.rule_set = [...site_rule_sets, ...ip_rule_sets];
 
         rules.filter(rule => !!rule.domain_suffix || !!rule.domain_keyword).map(rule => {
-            this.config.route.rules.push({
+            const ruleConfig = {
                 domain_suffix: rule.domain_suffix,
                 domain_keyword: rule.domain_keyword,
-                protocol: rule.protocol,
-                outbound: t(`outboundNames.${rule.outbound}`)
-            });
+                protocol: rule.protocol
+            };
+            // Use 'reject' action for Ad Block instead of outbound (sing-box 1.13.0+)
+            if (rule.outbound === 'Ad Block') {
+                ruleConfig.action = 'reject';
+            } else {
+                ruleConfig.outbound = t(`outboundNames.${rule.outbound}`);
+            }
+            this.config.route.rules.push(ruleConfig);
         });
 
         rules.filter(rule => !!rule.site_rules[0]).map(rule => {
-            this.config.route.rules.push({
+            const ruleConfig = {
                 rule_set: [
                 ...(rule.site_rules.length > 0 && rule.site_rules[0] !== '' ? rule.site_rules : []),
                 ],
-                protocol: rule.protocol,
-                outbound: t(`outboundNames.${rule.outbound}`)
-            });
+                protocol: rule.protocol
+            };
+            // Use 'reject' action for Ad Block instead of outbound (sing-box 1.13.0+)
+            if (rule.outbound === 'Ad Block') {
+                ruleConfig.action = 'reject';
+            } else {
+                ruleConfig.outbound = t(`outboundNames.${rule.outbound}`);
+            }
+            this.config.route.rules.push(ruleConfig);
         });
 
         rules.filter(rule => !!rule.ip_rules[0]).map(rule => {
-            this.config.route.rules.push({
+            const ruleConfig = {
                 rule_set: [
                 ...(rule.ip_rules.filter(ip => ip.trim() !== '').map(ip => `${ip}-ip`))
                 ],
-                protocol: rule.protocol,
-                outbound: t(`outboundNames.${rule.outbound}`)
-          });
+                protocol: rule.protocol
+            };
+            // Use 'reject' action for Ad Block instead of outbound (sing-box 1.13.0+)
+            if (rule.outbound === 'Ad Block') {
+                ruleConfig.action = 'reject';
+            } else {
+                ruleConfig.outbound = t(`outboundNames.${rule.outbound}`);
+            }
+            this.config.route.rules.push(ruleConfig);
         });
 
         rules.filter(rule => !!rule.ip_cidr).map(rule => {
-            this.config.route.rules.push({
+            const ruleConfig = {
                 ip_cidr: rule.ip_cidr,
-                protocol: rule.protocol,
-                outbound: t(`outboundNames.${rule.outbound}`)
-            });
+                protocol: rule.protocol
+            };
+            // Use 'reject' action for Ad Block instead of outbound (sing-box 1.13.0+)
+            if (rule.outbound === 'Ad Block') {
+                ruleConfig.action = 'reject';
+            } else {
+                ruleConfig.outbound = t(`outboundNames.${rule.outbound}`);
+            }
+            this.config.route.rules.push(ruleConfig);
         });
 
         this.config.route.rules.unshift(
