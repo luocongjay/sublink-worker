@@ -171,10 +171,12 @@ dist
 .dev.vars
 .wrangler/
 
-test
 .editorconfig
 .prettierrc
 package-lock.json
 
 .DS_Store
 singbox-config.json
+.vercel
+
+CLAUDE.local.md
