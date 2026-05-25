@@ -17,6 +17,7 @@ import { ConfigStorageService } from '../services/configStorageService.js';
 import { ServiceError, MissingDependencyError } from '../services/errors.js';
 import { normalizeRuntime } from '../runtime/runtimeConfig.js';
 import { PREDEFINED_RULE_SETS, SING_BOX_CONFIG, SING_BOX_CONFIG_V1_11 } from '../config/index.js';
+import { setGithubProxyPrefix } from '../config/ruleUrls.js';
 
 const DEFAULT_USER_AGENT = 'curl/7.74.0';
 
@@ -28,6 +29,14 @@ export function createApp(bindings = {}) {
     };
 
     const app = new Hono();
+
+    function setupProxy(c) {
+        const origin = new URL(c.req.url).origin;
+        const prefix = runtime.config.githubProxyUrl
+            ? runtime.config.githubProxyUrl.replace(/\/?$/, '/')
+            : `${origin}/proxy/github/`;
+        setGithubProxyPrefix(prefix);
+    }
 
     app.use('*', async (c, next) => {
         const acceptLanguage = getRequestHeader(c.req, 'Accept-Language');
@@ -111,6 +120,7 @@ export function createApp(bindings = {}) {
                 externalUiDownloadUrl,
                 singboxConfigVersion
             );
+            setupProxy(c);
             await builder.build();
             return c.json(builder.config);
         } catch (error) {
@@ -153,6 +163,7 @@ export function createApp(bindings = {}) {
                 externalController,
                 externalUiDownloadUrl
             );
+            setupProxy(c);
             await builder.build();
             return c.text(builder.formatConfig(), 200, {
                 'Content-Type': 'text/yaml; charset=utf-8'
@@ -192,8 +203,8 @@ export function createApp(bindings = {}) {
                 groupByCountry
             );
             builder.setSubscriptionUrl(c.req.url);
+            setupProxy(c);
             await builder.build();
-
             c.header('subscription-userinfo', 'upload=0; download=0; total=10737418240; expire=2546249531');
             return c.text(builder.formatConfig());
         } catch (error) {
@@ -324,6 +335,32 @@ export function createApp(bindings = {}) {
             return c.json({ originalUrl });
         } catch (error) {
             return handleError(c, error, runtime.logger);
+        }
+    });
+
+    app.get('/proxy/github/*', async (c) => {
+        const targetPath = c.req.param('*');
+        if (!targetPath) {
+            return c.text('Missing target path', 400);
+        }
+        const targetUrl = 'https://' + targetPath;
+        try {
+            const urlObj = new URL(targetUrl);
+            const allowedHosts = ['raw.githubusercontent.com', 'github.com'];
+            if (!allowedHosts.includes(urlObj.hostname)) {
+                return c.text('Only GitHub URLs are allowed', 403);
+            }
+            const response = await fetch(targetUrl);
+            if (!response.ok) {
+                return c.text('Failed to fetch from GitHub', response.status);
+            }
+            return c.body(response.body, response.status, {
+                'Content-Type': response.headers.get('Content-Type') || 'application/octet-stream',
+                'Cache-Control': 'public, max-age=3600',
+            });
+        } catch (error) {
+            runtime.logger.error('GitHub proxy fetch failed', error);
+            return c.text(`Error: ${error.message}`, 502);
         }
     });
 

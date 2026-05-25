@@ -1,5 +1,6 @@
 
 import { SING_BOX_CONFIG, generateRuleSets, generateRules, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
+import { applyGithubProxy } from '../config/ruleUrls.js';
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { deepCopy, groupProxiesByCountry } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
@@ -474,7 +475,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         // 如果启用 Clash UI 或传入了自定义参数，添加/覆盖 Clash API 配置
         if (this.enableClashUI || this.externalController || this.externalUiDownloadUrl) {
             const defaultExternalController = "0.0.0.0:9090";
-            const defaultExternalUiDownloadUrl = "https://gh-proxy.com/https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip";
+            const defaultExternalUiDownloadUrl = applyGithubProxy("https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip");
             const defaultExternalUi = "./ui";
             const defaultSecret = "";
             const defaultDownloadDetour = "DIRECT";

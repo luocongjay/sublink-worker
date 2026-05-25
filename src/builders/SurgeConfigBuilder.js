@@ -1,6 +1,7 @@
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { groupProxiesByCountry } from '../utils.js';
 import { SURGE_CONFIG, SURGE_SITE_RULE_SET_BASEURL, SURGE_IP_RULE_SET_BASEURL, generateRules, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
+import { applyGithubProxy } from '../config/ruleUrls.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
 import { buildSelectorMembers, buildNodeSelectMembers, uniqueNames } from './helpers/groupBuilder.js';
 
@@ -421,13 +422,13 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
 
         rules.filter(rule => rule.site_rules[0] !== '').map(rule => {
             rule.site_rules.forEach(site => {
-                finalConfig.push(`RULE-SET,${SURGE_SITE_RULE_SET_BASEURL}${site}.conf,${this.t('outboundNames.' + rule.outbound)}`);
+                finalConfig.push(`RULE-SET,${applyGithubProxy(`${SURGE_SITE_RULE_SET_BASEURL}${site}.conf`)},${this.t('outboundNames.' + rule.outbound)}`);
             });
         });
 
         rules.filter(rule => rule.ip_rules[0] !== '').map(rule => {
             rule.ip_rules.forEach(ip => {
-                finalConfig.push(`RULE-SET,${SURGE_IP_RULE_SET_BASEURL}${ip}.txt,${this.t('outboundNames.' + rule.outbound)},no-resolve`);
+                finalConfig.push(`RULE-SET,${applyGithubProxy(`${SURGE_IP_RULE_SET_BASEURL}${ip}.txt`)},${this.t('outboundNames.' + rule.outbound)},no-resolve`);
             });
         });
 

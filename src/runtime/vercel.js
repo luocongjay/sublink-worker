@@ -11,7 +11,8 @@ export function createVercelRuntime(env = process.env) {
         logger: console,
         config: {
             configTtlSeconds: undefined,
-            shortLinkTtlSeconds: null
+            shortLinkTtlSeconds: null,
+            githubProxyUrl: env.GITHUB_PROXY_URL || undefined
         }
     };
 }

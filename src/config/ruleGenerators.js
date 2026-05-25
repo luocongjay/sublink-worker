@@ -4,7 +4,7 @@
  */
 
 import { UNIFIED_RULES, PREDEFINED_RULE_SETS, SITE_RULE_SETS, IP_RULE_SETS, CLASH_SITE_RULE_SETS, CLASH_IP_RULE_SETS } from './rules.js';
-import { SITE_RULE_SET_BASE_URL, IP_RULE_SET_BASE_URL, CLASH_SITE_RULE_SET_BASE_URL, CLASH_IP_RULE_SET_BASE_URL } from './ruleUrls.js';
+import { SITE_RULE_SET_BASE_URL, IP_RULE_SET_BASE_URL, CLASH_SITE_RULE_SET_BASE_URL, CLASH_IP_RULE_SET_BASE_URL, applyGithubProxy } from './ruleUrls.js';
 
 // Helper function to get outbounds based on selected rule names
 export function getOutbounds(selectedRuleNames) {
@@ -83,14 +83,14 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 		tag: rule,
 		type: 'remote',
 		format: 'binary',
-		url: `${SITE_RULE_SET_BASE_URL}${SITE_RULE_SETS[rule]}`,
+		url: applyGithubProxy(`${SITE_RULE_SET_BASE_URL}${SITE_RULE_SETS[rule]}`),
 	}));
 
 	const ip_rule_sets = Array.from(ipRuleSets).map(rule => ({
 		tag: `${rule}-ip`,
 		type: 'remote',
 		format: 'binary',
-		url: `${IP_RULE_SET_BASE_URL}${IP_RULE_SETS[rule]}`,
+		url: applyGithubProxy(`${IP_RULE_SET_BASE_URL}${IP_RULE_SETS[rule]}`),
 	}));
 
 	if (!selectedRules.includes('Non-China')) {
@@ -98,7 +98,7 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 			tag: 'geolocation-!cn',
 			type: 'remote',
 			format: 'binary',
-			url: `${SITE_RULE_SET_BASE_URL}geosite-geolocation-!cn.srs`,
+			url: applyGithubProxy(`${SITE_RULE_SET_BASE_URL}geosite-geolocation-!cn.srs`),
 		});
 	}
 
@@ -110,7 +110,7 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 						tag: site.trim(),
 						type: 'remote',
 						format: 'binary',
-						url: `${SITE_RULE_SET_BASE_URL}geosite-${site.trim()}.srs`,
+						url: applyGithubProxy(`${SITE_RULE_SET_BASE_URL}geosite-${site.trim()}.srs`),
 					});
 				});
 			}
@@ -120,7 +120,7 @@ export function generateRuleSets(selectedRules = [], customRules = []) {
 						tag: `${ip.trim()}-ip`,
 						type: 'remote',
 						format: 'binary',
-						url: `${IP_RULE_SET_BASE_URL}geoip-${ip.trim()}.srs`,
+						url: applyGithubProxy(`${IP_RULE_SET_BASE_URL}geoip-${ip.trim()}.srs`),
 					});
 				});
 			}
@@ -162,7 +162,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
 			type: 'http',
 			format: 'mrs',
 			behavior: 'domain',
-			url: `${CLASH_SITE_RULE_SET_BASE_URL}${CLASH_SITE_RULE_SETS[rule]}`,
+			url: applyGithubProxy(`${CLASH_SITE_RULE_SET_BASE_URL}${CLASH_SITE_RULE_SETS[rule]}`),
 			path: `./ruleset/${CLASH_SITE_RULE_SETS[rule]}`,
 			interval: 86400
 		};
@@ -173,7 +173,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
 			type: 'http',
 			format: 'mrs',
 			behavior: 'ipcidr',
-			url: `${CLASH_IP_RULE_SET_BASE_URL}${CLASH_IP_RULE_SETS[rule]}`,
+			url: applyGithubProxy(`${CLASH_IP_RULE_SET_BASE_URL}${CLASH_IP_RULE_SETS[rule]}`),
 			path: `./ruleset/${CLASH_IP_RULE_SETS[rule]}`,
 			interval: 86400
 		};
@@ -185,7 +185,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
 			type: 'http',
 			format: 'mrs',
 			behavior: 'domain',
-			url: `${CLASH_SITE_RULE_SET_BASE_URL}geolocation-!cn.mrs`,
+			url: applyGithubProxy(`${CLASH_SITE_RULE_SET_BASE_URL}geolocation-!cn.mrs`),
 			path: './ruleset/geolocation-!cn.mrs',
 			interval: 86400
 		};
@@ -201,7 +201,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
 						type: 'http',
 						format: 'mrs',
 						behavior: 'domain',
-						url: `${CLASH_SITE_RULE_SET_BASE_URL}${site_trimmed}.mrs`,
+						url: applyGithubProxy(`${CLASH_SITE_RULE_SET_BASE_URL}${site_trimmed}.mrs`),
 						path: `./ruleset/${site_trimmed}.mrs`,
 						interval: 86400
 					};
@@ -214,7 +214,7 @@ export function generateClashRuleSets(selectedRules = [], customRules = []) {
 						type: 'http',
 						format: 'mrs',
 						behavior: 'ipcidr',
-						url: `${CLASH_IP_RULE_SET_BASE_URL}${ip_trimmed}.mrs`,
+						url: applyGithubProxy(`${CLASH_IP_RULE_SET_BASE_URL}${ip_trimmed}.mrs`),
 						path: `./ruleset/${ip_trimmed}.mrs`,
 						interval: 86400
 					};

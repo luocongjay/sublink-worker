@@ -1,5 +1,6 @@
 import yaml from 'js-yaml';
 import { CLASH_CONFIG, generateRules, generateClashRuleSets, getOutbounds, PREDEFINED_RULE_SETS } from '../config/index.js';
+import { applyGithubProxy } from '../config/ruleUrls.js';
 import { BaseConfigBuilder } from './BaseConfigBuilder.js';
 import { deepCopy, groupProxiesByCountry } from '../utils.js';
 import { addProxyWithDedup } from './helpers/proxyHelpers.js';
@@ -579,7 +580,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
             const defaultController = '0.0.0.0:9090';
             const defaultUiPath = './ui';
             const defaultUiName = 'zashboard';
-            const defaultUiUrl = 'https://gh-proxy.com/https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip';
+            const defaultUiUrl = applyGithubProxy('https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip');
             const defaultSecret = '';
 
             const controller = this.externalController || this.config['external-controller'] || defaultController;
