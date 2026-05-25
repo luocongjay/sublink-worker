@@ -338,8 +338,8 @@ export function createApp(bindings = {}) {
         }
     });
 
-    app.get('/proxy/github/*', async (c) => {
-        const targetPath = c.req.param('*');
+    app.get('/proxy/*', async (c) => {
+        const targetPath = c.req.path.slice('/proxy/'.length);
         if (!targetPath) {
             return c.text('Missing target path', 400);
         }
